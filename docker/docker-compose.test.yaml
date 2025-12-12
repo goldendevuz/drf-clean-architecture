@@ -1,10 +1,10 @@
-version: '3.8'
-
 services:
   api:
     image: forex:test
     restart: on-failure
     command: sh scripts/start_api.sh
+    env_file:
+      - ./../.env
     environment:
       - DJANGO_ENV=test
       - DJANGO_PORT=8000
@@ -14,17 +14,16 @@ services:
       - ../tests:/code/tests
   cache:
     restart: on-failure
+    env_file:
+      - ./../.env
     environment:
       - REDIS_PORT=6379
     volumes:
       - redisdata_test:/var/lib/redis/data
   db:
     restart: on-failure
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB:-forex_test}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+    env_file:
+      - ./../.env
     volumes:
       - pgdata_test:/var/lib/postgresql/data
     healthcheck:
@@ -36,6 +35,8 @@ services:
     image: worker:test
     restart: on-failure
     command: sh scripts/start_worker.sh
+    env_file:
+      - ./../.env
     environment:
       - DJANGO_ENV=test
     volumes:

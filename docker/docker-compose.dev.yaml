@@ -1,43 +1,39 @@
-version: '3.8'
-
 services:
   api:
     image: forex:development
     restart: on-failure
     command: sh scripts/start_api.sh
+    env_file:
+      - ./../.env
     environment:
-      - DJANGO_ENV=development
-      - DJANGO_PORT=8000
+      DJANGO_ENV: development
     volumes:
       - ../scripts:/code/scripts
       - ../src:/code/src
       - ../tests:/code/tests
+
   cache:
     restart: on-failure
     environment:
-      - REDIS_PORT=6379
+      REDIS_PORT: 6379
     volumes:
       - redisdata_development:/var/lib/redis/data
+
   db:
     restart: on-failure
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB:-forex}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+    env_file:
+      - ./../.env
     volumes:
       - pgdata_development:/var/lib/postgresql/data
-    healthcheck:
-      test: pg_isready -q -d forex -U postgres
-      interval: 10s
-      timeout: 10s
-      retries: 5
+
   worker:
     image: worker:development
     restart: on-failure
     command: sh scripts/start_worker.sh
+    env_file:
+      - ./../.env
     environment:
-      - DJANGO_ENV=development
+      DJANGO_ENV: development
     volumes:
       - ../scripts:/code/scripts
       - ../src:/code/src
@@ -45,8 +41,4 @@ services:
 
 volumes:
   pgdata_development:
-    driver: local
-    name: pgdata_development
   redisdata_development:
-    driver: local
-    name: redisdata_development

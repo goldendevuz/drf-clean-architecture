@@ -2,38 +2,14 @@
 
 from src.infrastructure.settings.base import *
 
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'forex',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-        'PORT': '5432',
-    }
-}
-
-
-# Cache
-# https://docs.djangoproject.com/en/3.2/topics/cache/
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://cache:6379/1',
-        'TIMEOUT': 60 * 60 * 24,
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'SOCKET_CONNECT_TIMEOUT': 5,
-            'SOCKET_TIMEOUT': 5,
-        }
-    }
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Ex Forex - Django Clean Architecture',
+    "DESCRIPTION": "Clean Architecture approach for Django project code structure implementation.",
+    'VERSION': '0.0.1',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    'COMPONENT_SPLIT_REQUEST':True,
+    'SCHEMA_PATH_PREFIX': r'/api/',  # Example: /api/users will get 'users' tag,
 }
