@@ -1,4 +1,4 @@
-# _Forex - Django Clean Architecture_
+# _Ex Forex - Django Clean Architecture_
 
 This repository contains the code for Forex API backend. The application aims to provide information for all currencies, latests and historical time series exchange rates for currency pairs, currency conversion and time weighted rates calculation.
 
