@@ -3,6 +3,7 @@
 import os
 
 from src.infrastructure.settings.base import *
+from src.infrastructure.settings.config import REDIS_URL
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -30,7 +31,7 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f'redis://cache:{os.environ.get("REDIS_PORT")}/1',
+        'LOCATION': REDIS_URL,
         'TIMEOUT': 60 * 60 * 24,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
@@ -38,4 +39,16 @@ CACHES = {
             'SOCKET_TIMEOUT': 5,
         }
     }
+}
+
+# Collect static files here
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
 }

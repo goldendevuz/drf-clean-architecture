@@ -10,40 +10,68 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from pathlib import Path
+from corsheaders.defaults import default_headers
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
+from .config import (
+    ALLOWED_HOSTS, SECRET_KEY, DEBUG, CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, BASE_DIR, TIME_ZONE, CELERY_BROKER_URL, CELERY_RESULT_BACKEND
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-e-)^!t4%*e$63q&@q5pjk4479+d7(ttg-=9#@cfr26$==ud75x'
-
-ALLOWED_HOSTS = ['*']
-
+BASE_DIR = BASE_DIR
+SECRET_KEY = SECRET_KEY
+DEBUG = DEBUG
+ALLOWED_HOSTS = ALLOWED_HOSTS
+INTERNAL_IPS = ALLOWED_HOSTS
+CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS
+CORS_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS
+CORS_ALLOW_HEADERS = list(default_headers) + ['authorization']
 
 # Application definition
 
 INSTALLED_APPS = [
+    # 'jazzmin',
+    'django_daisy',
     'django.contrib.admin',
+    'django.contrib.humanize',  # Required
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # third-party
+]
+
+THIRD_APPS = {
+    'drf_material',
     'rest_framework',
-    # project
+    'corsheaders',
+    'import_export',
+    "debug_toolbar",
+    'schema_viewer',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',  # required for Django collectstatic discovery
+    'rest_framework_json_api',
+    "django_celery_beat",
+    "django_celery_results",
+    'adrf',
+}
+
+LOCAL_APPS = [
     'src.infrastructure.orm.db.exchange_rate',
     'src.infrastructure.orm.db.provider',
 ]
 
+INSTALLED_APPS += THIRD_APPS
+INSTALLED_APPS += LOCAL_APPS
+
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -72,6 +100,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'src.infrastructure.server.wsgi.application'
+ASGI_APPLICATION = 'src.infrastructure.server.asgi.application'
 
 
 # Password validation
@@ -131,9 +160,9 @@ LOGGING = {
 # Celery application definition
 # https://docs.celeryproject.org/en/stable/django/
 
-CELERY_BROKER_URL = 'redis://cache:6379'
+CELERY_BROKER_URL = CELERY_BROKER_URL
 
-CELERY_RESULT_BACKEND = 'redis://cache:6379'
+CELERY_RESULT_BACKEND = CELERY_RESULT_BACKEND
 
 CELERY_ACCEPT_CONTENT = ['application/json']
 
@@ -141,13 +170,17 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 CELERY_TASK_SERIALIZER = 'json'
 
+CELERY_TIMEZONE = TIME_ZONE
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = TIME_ZONE
 
 USE_I18N = True
 
@@ -161,7 +194,79 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+REST_FRAMEWORK = {
+    # ⚡ Pagination (JSON:API compatible)
+    "PAGE_SIZE": 10,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework_json_api.pagination.JsonApiPageNumberPagination",
+
+    # 🎨 Renderers (JSON:API first)
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework_json_api.renderers.JSONRenderer",
+        "rest_framework_json_api.renderers.BrowsableAPIRenderer",  # disable in prod if not needed
+    ),
+
+    # 📝 Metadata
+    "DEFAULT_METADATA_CLASS": "rest_framework_json_api.metadata.JSONAPIMetadata",
+
+    # 🔎 Filtering, Ordering, Searching
+    "DEFAULT_FILTER_BACKENDS": (
+        "rest_framework_json_api.filters.QueryParameterValidationFilter",
+        "rest_framework_json_api.filters.OrderingFilter",
+        "rest_framework_json_api.django_filters.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+    ),
+    "SEARCH_PARAM": "filter[search]",
+
+    # 🧪 Testing
+    "TEST_REQUEST_RENDERER_CLASSES": (
+        "rest_framework_json_api.renderers.JSONRenderer",
+    ),
+    "TEST_REQUEST_DEFAULT_FORMAT": "vnd.api+json",
+
+    # 🔐 Permissions
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.AllowAny",
+        # "rest_framework.permissions.IsAuthenticated",
+    ),
+
+    # 🔑 Authentication (JWT first)
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        # 'rest_framework.authentication.SessionAuthentication',
+        "rest_framework.authentication.BasicAuthentication",  # useful for docs/dev
+    ),
+
+    # 📥 Parsers (JSON:API + fallback)
+    "DEFAULT_PARSER_CLASSES": (
+        "rest_framework_json_api.parsers.JSONParser",
+        "rest_framework.parsers.FormParser",
+        "rest_framework.parsers.MultiPartParser",
+    ),
+
+    # 🚨 Exceptions & Schema
+    "EXCEPTION_HANDLER": "src.api.shared.exceptions.json_api_exception_handler",
+    "DEFAULT_SCHEMA_CLASS": "drf_standardized_errors.openapi.AutoSchema",
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '10000/day',
+        'anon': '1000/hour',
+    },
+    'NON_FIELD_ERRORS_KEY': 'error',
+}
+
+DRF_STANDARDIZED_ERRORS = {"ENABLE_IN_DEBUG_FOR_UNHANDLED_EXCEPTIONS": True}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"

@@ -12,7 +12,12 @@ cd ${PROJECT_DIR}
 echo "Change to working directory $(pwd)"
 
 # Run database migrations
+python manage.py makemigrations
 python manage.py migrate
+python manage.py migrate --fake
+
+echo "Collecting static files..."
+python manage.py collectstatic --noinput
 
 if [ ${DJANGO_ENV} = 'development' ]; then
     # Create superuser if not exists
@@ -28,4 +33,5 @@ if [ ${DJANGO_ENV} = 'development' ]; then
 fi
 
 # Start API server
-python manage.py runserver 0.0.0.0:${DJANGO_PORT}
+echo "Starting Uvicorn ASGI server..."
+uvicorn core.asgi:application --host 0.0.0.0 --port ${DJANGO_PORT}

@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from src.infrastructure.settings.base import *
+from src.infrastructure.settings.config import REDIS_URL
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -28,7 +29,7 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://cache:6379/0',
+        'LOCATION': REDIS_URL,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }

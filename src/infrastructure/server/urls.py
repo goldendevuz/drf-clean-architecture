@@ -18,9 +18,20 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
+from debug_toolbar.toolbar import debug_toolbar_urls
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from src.infrastructure.settings.config import ADMIN_URL, REDOC_URL, SWAGGER_URL
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include((f'{settings.API_ROUTES}.urls', 'api'), namespace='api'))
-]
+    path(ADMIN_URL, admin.site.urls),
+    path('api/', include((f'{settings.API_ROUTES}.urls', 'api'), namespace='api')),
+    
+    path('api-auth/', include('rest_framework.urls')),  # Important for login/logout
+    path('schema-viewer/', include('schema_viewer.urls')),
+    
+    # Spectacular schema and UI docs
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path(SWAGGER_URL, SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path(REDOC_URL, SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+] + debug_toolbar_urls()
