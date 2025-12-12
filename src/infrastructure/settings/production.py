@@ -1,28 +1,11 @@
 # coding: utf-8
 
-import os
-
 from src.infrastructure.settings.base import *
 from src.infrastructure.settings.config import REDIS_URL
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('POSTGRES_DB'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'db',
-        'PORT': os.environ.get('POSTGRES_PORT'),
-    }
-}
 
 
 # Cache
@@ -40,9 +23,6 @@ CACHES = {
         }
     }
 }
-
-# Collect static files here
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STORAGES = {
     "staticfiles": {

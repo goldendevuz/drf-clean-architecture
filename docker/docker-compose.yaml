@@ -3,7 +3,8 @@ services:
     build:
       context: ./..
       dockerfile: ./docker/Dockerfile
-    container_name: forex_api
+    env_file:
+      - ./../.env
     ports:
       - ${DJANGO_PORT:-8000}:${DJANGO_PORT:-8000}
     depends_on:
@@ -11,26 +12,37 @@ services:
         condition: service_healthy
       cache:
         condition: service_healthy
+
   cache:
     image: redis:7-alpine
-    container_name: forex_cache
+    env_file:
+      - ./../.env
     ports:
       - ${REDIS_PORT:-6379}:${REDIS_PORT:-6379}
     healthcheck:
-      test: redis-cli ping
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
-      timeout: 10s
+      timeout: 5s
       retries: 5
+
   db:
     image: postgres:17-alpine
-    container_name: forex_db
+    env_file:
+      - ./../.env
     ports:
       - ${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   worker:
     build:
       context: ./..
       dockerfile: ./docker/Dockerfile
-    container_name: forex_worker
+    env_file:
+      - ./../.env
     depends_on:
       db:
         condition: service_healthy

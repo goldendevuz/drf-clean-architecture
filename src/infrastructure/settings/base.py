@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from corsheaders.defaults import default_headers
 
 from .config import (
-    ALLOWED_HOSTS, SECRET_KEY, DEBUG, CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, BASE_DIR, TIME_ZONE, CELERY_BROKER_URL, CELERY_RESULT_BACKEND
+    ALLOWED_HOSTS, SECRET_KEY, DEBUG, CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, BASE_DIR, TIME_ZONE, CELERY_BROKER_URL, CELERY_RESULT_BACKEND, DATABASES
 )
 
 # Quick-start development settings - unsuitable for production
@@ -270,3 +270,12 @@ DRF_STANDARDIZED_ERRORS = {"ENABLE_IN_DEBUG_FOR_UNHANDLED_EXCEPTIONS": True}
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
+
+
+# Database
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+
+DATABASES = DATABASES
+
+# Collect static files here
+STATIC_ROOT = BASE_DIR / 'staticfiles'

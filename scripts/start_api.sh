@@ -26,12 +26,19 @@ if [ ${DJANGO_ENV} = 'development' ]; then
     export DJANGO_SUPERUSER_EMAIL="admin@forex.com"
     python manage.py createsuperuser --noinput || echo "Superuser already exists."
 
-    # Load fixtures if needed
-    for file in "${PROJECT_DIR}/fixtures/*.json"; do
-        python manage.py loaddata $file
+    FIXTURE_DIR="$PROJECT_DIR/fixtures"
+
+    # Load all fixtures if present
+    for file in $FIXTURE_DIR/*.json; do
+        # Skip loop if no files found
+        [ -e "$file" ] || continue
+
+        echo "Loading fixture: $file"
+        python manage.py loaddata "$file"
     done
+
 fi
 
 # Start API server
 echo "Starting Uvicorn ASGI server..."
-uvicorn core.asgi:application --host 0.0.0.0 --port ${DJANGO_PORT}
+uvicorn src.infrastructure.server.asgi:application --host 0.0.0.0 --port ${DJANGO_PORT}

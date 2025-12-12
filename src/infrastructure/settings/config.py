@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from decouple import config, Csv
 import dj_database_url
@@ -6,9 +5,9 @@ import dj_database_url
 # ----------------------------
 # Base & .env check
 # ----------------------------
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-env_file_path = BASE_DIR / "core" / ".env"
+env_file_path = BASE_DIR / ".env"
 if not env_file_path.exists():
     print(f".env file not found at {env_file_path}")
     print("Copy .env.example and adjust it to your environment.")
@@ -38,7 +37,7 @@ TEST_DB_NAME = config("TEST_DB_NAME", default="test_db.sqlite3")
 # Universal database URL
 DATABASE_URL = config(
     "DATABASE_URL",
-    default=f"sqlite:///{BASE_DIR / DB_NAME}"
+    # default=f"sqlite:///{BASE_DIR / DB_NAME}"
 )
 parsed_db = dj_database_url.parse(DATABASE_URL)
 
@@ -46,9 +45,9 @@ parsed_db = dj_database_url.parse(DATABASE_URL)
 if "postgres" in parsed_db.get("ENGINE", ""):
     parsed_db["ENGINE"] = "django.db.backends.postgresql"
     parsed_db["CONN_MAX_AGE"] = config("CONN_MAX_AGE", default=0, cast=int)
-else:
-    parsed_db["ENGINE"] = "django.db.backends.sqlite3"
-    parsed_db["NAME"] = parsed_db.get("NAME", str(BASE_DIR / DB_NAME))
+# else:
+#     parsed_db["ENGINE"] = "django.db.backends.sqlite3"
+#     parsed_db["NAME"] = parsed_db.get("NAME", str(BASE_DIR / DB_NAME))
 
 # Test database
 parsed_db["TEST"] = {
@@ -63,3 +62,5 @@ DATABASES = {"default": parsed_db}
 REDIS_URL = config("REDIS_URL", default='redis://redis:6379/0')
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default=REDIS_URL)
 CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default=REDIS_URL)
+
+DJANGO_ENV = config("DJANGO_ENV", default="development")
