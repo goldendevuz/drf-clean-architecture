@@ -253,7 +253,7 @@ REST_FRAMEWORK = {
     ),
 
     # 🚨 Exceptions & Schema
-    "EXCEPTION_HANDLER": "src.api.shared.exceptions.json_api_exception_handler",
+    "EXCEPTION_HANDLER": "src.interface.controllers.exceptions.json_api_exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_standardized_errors.openapi.AutoSchema",
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.UserRateThrottle',

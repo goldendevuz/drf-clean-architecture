@@ -16,8 +16,8 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py migrate --fake
 
-echo "Collecting static files..."
-python manage.py collectstatic --noinput
+# echo "Collecting static files..."
+# python manage.py collectstatic --noinput
 
 if [ ${DJANGO_ENV} = 'development' ]; then
     # Create superuser if not exists
