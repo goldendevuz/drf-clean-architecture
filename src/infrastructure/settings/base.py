@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from corsheaders.defaults import default_headers
 
 from .config import (
-    ALLOWED_HOSTS, SECRET_KEY, DEBUG, CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, BASE_DIR, TIME_ZONE, CELERY_BROKER_URL, CELERY_RESULT_BACKEND, DATABASES
+    ALLOWED_HOSTS, REDIS_URL, SECRET_KEY, DEBUG, CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, BASE_DIR, TIME_ZONE, CELERY_BROKER_URL, CELERY_RESULT_BACKEND, DATABASES
 )
 
 # Quick-start development settings - unsuitable for production
@@ -59,8 +59,6 @@ THIRD_APPS = {
 }
 
 LOCAL_APPS = [
-    'src.infrastructure.orm.db.exchange_rate',
-    'src.infrastructure.orm.db.provider',
 ]
 
 INSTALLED_APPS += THIRD_APPS
@@ -279,3 +277,19 @@ DATABASES = DATABASES
 
 # Collect static files here
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Cache
+# https://docs.djangoproject.com/en/3.2/topics/cache/
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        "LOCATION": REDIS_URL,
+        'TIMEOUT': 60 * 60 * 24,
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'SOCKET_CONNECT_TIMEOUT': 5,
+            'SOCKET_TIMEOUT': 5,
+        }
+    }
+}

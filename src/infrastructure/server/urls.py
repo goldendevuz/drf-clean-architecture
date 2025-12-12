@@ -25,7 +25,6 @@ from src.infrastructure.settings.config import ADMIN_URL, REDOC_URL, SWAGGER_URL
 
 urlpatterns = [
     path(ADMIN_URL, admin.site.urls),
-    path('api/', include((f'{settings.API_ROUTES}.urls', 'api'), namespace='api')),
     
     path('api-auth/', include('rest_framework.urls')),  # Important for login/logout
     path('schema-viewer/', include('schema_viewer.urls')),
